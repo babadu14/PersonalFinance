@@ -23,3 +23,9 @@ class RegisterSerielizer(serializers.ModelSerializer):
             raise serializers.ValidationError({"message":"passwords do not match"})
         return data
 
+    def create(self, validated_data):
+        validated_data.pop('password2')
+        user = User.objects.create_user(**validated_data)
+        user.is_active = False
+        user.save()
+        return user
