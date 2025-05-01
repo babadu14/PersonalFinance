@@ -2,6 +2,10 @@ from rest_framework import serializers
 from users.models import EmailVerification
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+
 
 User = get_user_model()
 
@@ -60,3 +64,41 @@ class PasswordResetSerializer(serializers.Serializer):
             raise serializers.ValidationError('user does not exist')
         return value
 
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid64 = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, required=True, validators = [validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+    
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"message":"password do nto match"})
+        
+        try:
+            uid = force_str(urlsafe_base64_decode(attrs["uid64"]))
+            user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError, TypeError):
+            raise serializers.ValidationError({"message":"მომხმარებელი ვერ მოიძებნა"})
+        
+        token = attrs["token"]
+        if not default_token_generator.check_token(user, token):
+            raise serializers.ValidationError({"message":"incorrect or expired token"})
+        
+        attrs["user"] = user
+        return attrs
+    
+    def save(self):
+        user = self.validated_data["user"]
+        user.set_password(self.validated_data["password"])
+        user.save()
+
+class EmailCodeResendSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    def validate(self, attrs):
+        email = attrs.get('email')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"message":"user was now found"})
+        attrs['user'] = user
+        return attrs
