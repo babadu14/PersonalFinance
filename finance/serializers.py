@@ -10,6 +10,15 @@ class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
         fields = '__all__'
+
+    def validate_limit(self,value):
+        if value <= 0:
+            raise serializers.ValidationError('Budget limit can not be negative or zero')
+        
+        if value > 1000000:
+            raise serializers.ValidationError('budget can not be higher than 1000000')  
+        
+        return value
     
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,4 +40,11 @@ class TransactionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"message":"budget is less than expense"})
         
         return data
+
+    def transaction_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('Transaction Value can not be negative or zero')
+        
+        return value
     
+   
