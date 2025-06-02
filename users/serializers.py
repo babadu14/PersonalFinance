@@ -99,6 +99,28 @@ class EmailCodeResendSerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            raise serializers.ValidationError({"message":"user was now found"})
+            raise serializers.ValidationError({"message":"user was not found"})
+        attrs['user'] = user
+        return attrs
+    
+class EmailCodeConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        code = attrs.get("code")
+
+        try:
+            user = User.objects.get(email=email)
+            verification = EmailVerification.objects.filter(user=user).first()
+            if not verification.code == code:
+                raise serializers.ValidationError({"message":"code is incorrect"})
+            
+            if verification.is_expired():
+                raise serializers.ValidationError({"message":"code is expired"})
+        except (User.DoesNotExist, EmailVerification.DoesNotExist):
+            raise serializers.ValidationError({"message":"user or the code is incorrect"})
+        
         attrs['user'] = user
         return attrs
