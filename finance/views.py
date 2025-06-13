@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from finance.serializers import BudgetSerializer, TransactionSerializer
 from finance.models import Budget, Transaction
 # Create your views here.
@@ -7,6 +8,7 @@ from finance.models import Budget, Transaction
 class BudgetViewSet(viewsets.ModelViewSet):
     queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
+    permission_classes = [IsAuthenticated]
 
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
