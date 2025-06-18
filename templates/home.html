@@ -3,16 +3,30 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-<p>Hi {{ user.username }}!</p>
-<p><a href="{% url 'password_change' %}">Password Change</a></p>
-<form action="{% url 'logout' %}" method="post">
-  {% csrf_token %}
-  <button type="submit">Log Out</button>
-</form>
-{% else %}
-<p>You are not logged in</p>
-<p><a href="{% url 'password_reset' %}">Password Reset</a></p>
-<p><a href="{% url 'login' %}">Log In</a></p>
-{% endif %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow rounded text-center">
+        <div class="card-body">
+          {% if user.is_authenticated %}
+            <h3 class="mb-3">Hi, {{ user.username }}!</h3>
+            <p>
+              <a href="{% url 'password_change' %}" class="btn btn-outline-primary mb-2">Change Password</a>
+            </p>
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Log Out</button>
+            </form>
+          {% else %}
+            <h4 class="mb-3">You are not logged in</h4>
+            <div class="d-grid gap-2 col-6 mx-auto">
+              <a href="{% url 'password_reset' %}" class="btn btn-warning">Forgot Password?</a>
+              <a href="{% url 'login' %}" class="btn btn-primary">Log In</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

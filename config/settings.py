@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'finance',
     'rest_framework',
     'users',
-
+    'bootstrap5',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
