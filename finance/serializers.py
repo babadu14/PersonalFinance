@@ -9,7 +9,7 @@ from django.db.models import DecimalField
 class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
-        fields = '__all__'
+        fields = ('category', 'limit')
 
     def validate_limit(self,value):
         if value <= 0:
