@@ -10,3 +10,12 @@ def create_budget_and_notify(user_email, feedback_url):
         recipient_list=[user_email],
         fail_silently=False,
     )
+
+def create_transaction_and_notify(user_email, feedback_url):
+    send_mail(
+        subject="✅ Your Transaction Has Been Created!",
+        message=f"Hello!\n\nYour Transaction has been successfully created. You can view the Transaction here:\n\n{feedback_url}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user_email],
+        fail_silently=False
+    )
